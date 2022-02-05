@@ -59,7 +59,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
     function getTokenHoldersCount() public view returns(uint entityCount) {
         return holderAddresses.length;
     }
-    function mintTimeNft(uint256 _validity, Mode _mode) public payable {
+    function mint(uint256 _validity, Mode _mode) public payable {
         require(saleIsActive, "Can't Purchase NFT as at this time");
         nftMode = _mode;
         if(uint256(nftMode) == 0) {
@@ -147,10 +147,87 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
             _tokenIds.increment();
         }
         
-  }
+    }
+
+    function renewNft(uint256 _validity, Mode _mode) public payable {
+        require(saleIsActive, "Can't Purchase NFT as at this time");
+        nftMode = _mode;
+        if(!checkTokenHolder(msg.sender)) revert();
+        uint userTokenId = tokenHolders[msg.sender].tokenId;
+        if(uint256(nftMode) == 0) {
+            require(msg.value >= mintPricePerDay * _validity, "Insufficient Funds");
+            string memory json = Base64.encode(
+            bytes(
+                string(
+                    abi.encodePacked(
+                        '{ "name": "Arnen #',
+                        userTokenId,
+                        '", "description": "A Special Time Based NFT to gain access to the Arnen Platform", ',
+                        '"traits": [{ "trait_type": "Mode", "value": "Time" }, { "trait_type": "Validity", "value": _validity }, {"trait_type": "Status", "value": "active"}], ',
+                        '"image": "ipfs://QmUuXqMvJckFhfoEaLFMEfum6roqgrjQedoRuitizw3kwQ" }'
+                        )
+                    )
+                )
+            );
+            string memory tokenURI = string(
+                abi.encodePacked("data:application/json;base64,", json)
+            );
+            console.log(tokenURI);
+            _safeMint(msg.sender, userTokenId);
+            _setTokenURI(userTokenId, tokenURI);
+            _tokenIds.increment();
+        }
+        else if(uint256(nftMode) == 1) {
+            require(msg.value >= mintPricePerActivity * _validity, "Insufficient Funds");
+            string memory json = Base64.encode(
+            bytes(
+                string(
+                    abi.encodePacked(
+                        '{ "name": "Arnen #',
+                        userTokenId,
+                        '", "description": "A Special Activity Based NFT to gain access to the Arnen Platform", ',
+                        '"traits": [{ "trait_type": "Mode", "value": "Activity" }, { "trait_type": "Validity", "value": _validity }, {"trait_type": "Status", "value": "active"}], ',
+                        '"image": "ipfs://QmUuXqMvJckFhfoEaLFMEfum6roqgrjQedoRuitizw3kwQ" }'
+                        )
+                    )
+                )
+            );
+            string memory tokenURI = string(
+                abi.encodePacked("data:application/json;base64,", json)
+            );
+            console.log(tokenURI);
+            _safeMint(msg.sender, userTokenId);
+            _setTokenURI(userTokenId, tokenURI);
+            _tokenIds.increment();
+        }
+        else if(uint256(nftMode) == 2) {
+            require(msg.value >= mintPriceCert, "Insufficient Funds");
+            string memory json = Base64.encode(
+            bytes(
+                string(
+                    abi.encodePacked(
+                        '{ "name": "Arnen #',
+                        userTokenId,
+                        '", "description": "A Special Activity Based NFT to gain access to the Arnen Platform", ',
+                        '"traits": [{ "trait_type": "Mode", "value": "Certification" }, { "trait_type": "Validity", "value": _validity }, {"trait_type": "Status", "value": "active"}], ',
+                        '"image": "ipfs://QmUuXqMvJckFhfoEaLFMEfum6roqgrjQedoRuitizw3kwQ" }'
+                        )
+                    )
+                )
+            );
+            string memory tokenURI = string(
+                abi.encodePacked("data:application/json;base64,", json)
+            );
+            console.log(tokenURI);
+            _safeMint(msg.sender,userTokenId);
+            _setTokenURI(userTokenId, tokenURI);
+            holderAddresses.push(msg.sender);
+            _tokenIds.increment();
+        }
+        
+    }
 
     // update
-    // tip
     function tip() public payable returns (bool) {
         require(msg.value >= minTip, "Minimum tip is 0.00035");
         totalAmountTipped += msg.value;
