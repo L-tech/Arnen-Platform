@@ -227,7 +227,8 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
         
     }
 
-    // update
+    // update - change NFT validity after 24 hours for Time based and after a click for activity baseed NFT
+
     function tip() public payable returns (bool) {
         require(msg.value >= minTip, "Minimum tip is 0.00035");
         totalAmountTipped += msg.value;
@@ -235,8 +236,6 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
         return true;
         
     }
-
-    // renew
 
     function getRandomNumber() public returns (bytes32 requestId) {
         require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
