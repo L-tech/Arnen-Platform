@@ -247,7 +247,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
      */
     function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
         uint 
-        randomResult = (randomness % getTokenHoldersCount()) + 1;
+        randomResult = (randomness % getTokenHoldersCount() - 1) + 1;
     }
     function DistributeTip() public onlyOwner payable {
         // This returns a boolean value indicating success or failure.
