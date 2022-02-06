@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
-import "./Base64.sol";
+import "./utils.Base64.sol";
 
 contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
     bool public saleIsActive;
