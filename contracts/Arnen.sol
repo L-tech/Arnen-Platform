@@ -45,7 +45,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
         ) payable {
         _tokenIds.increment();
         keyHash = 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
-        fee = 0.1 * 10 ** 18; // 0.1 LINK (Varies by network)
+        fee = 0.2 * 10 ** 18; // 0.1 LINK (Varies by network)
     }
     function checkTokenHolder(address _address) public view returns(bool) {
         return tokenHolders[_address].isTokenHolder;
