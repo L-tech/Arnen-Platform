@@ -47,7 +47,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
         keyHash = 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
         fee = 0.1 * 10 ** 18; // 0.1 LINK (Varies by network)
     }
-    function checkTokenHolder(address _address) public view returns(bool isIndeed) {
+    function checkTokenHolder(address _address) public view returns(bool) {
         return tokenHolders[_address].isTokenHolder;
     }
     function openNFTSale() public onlyOwner {
@@ -56,7 +56,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
     function closeSale() public onlyOwner {
         saleIsActive = false;
     }
-    function getTokenHoldersCount() public view returns(uint entityCount) {
+    function getTokenHoldersCount() public view returns(uint) {
         return holderAddresses.length;
     }
     function mint(uint256 _validity, Mode _mode) public payable {
