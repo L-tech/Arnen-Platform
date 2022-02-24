@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
-import "./utils.Base64.sol";
+import "./utils/Base64.sol";
 
 contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
     bool public saleIsActive;
@@ -60,7 +60,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
         return holderAddresses.length;
     }
     function mint(uint256 _validity, Mode _mode) public payable {
-        require(saleIsActive, "Can't Purchase NFT as at this time");
+        require(saleIsActive, "Sale Closed");
         nftMode = _mode;
         if(uint256(nftMode) == 0) {
             require(msg.value >= mintPricePerDay * _validity, "Insufficient Funds");
@@ -152,7 +152,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
     function renewNft(uint256 _validity, Mode _mode) public payable {
         require(saleIsActive, "Can't Purchase NFT as at this time");
         nftMode = _mode;
-        if(!checkTokenHolder(msg.sender)) revert();
+        if(!checkTokenHolder(msg.sender)) revert("No NFT");
         uint userTokenId = tokenHolders[msg.sender].tokenId;
         if(uint256(nftMode) == 0) {
             require(msg.value >= mintPricePerDay * _validity, "Insufficient Funds");
@@ -238,7 +238,7 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
     }
 
     function getRandomNumber() public returns (bytes32 requestId) {
-        require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
+        require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK");
         return requestRandomness(keyHash, fee);
     }
 
@@ -246,17 +246,16 @@ contract Arnen is ERC721URIStorage, Ownable, VRFConsumerBase {
      * Callback function used by VRF Coordinator
      */
     function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-        uint 
         randomResult = (randomness % getTokenHoldersCount() - 1) + 1;
     }
-    function DistributeTip() public onlyOwner payable {
+    function distributeTip() public onlyOwner payable {
         // This returns a boolean value indicating success or failure.
         require(msg.value <= totalAmountTipped, "Insuffiecient Amount");
         address payable beneficiary = payable(holderAddresses[randomResult]);
         uint beneficiaryAmount = (30 * msg.value) / 100;
         (bool sent, bytes memory data) = beneficiary.call{value: beneficiaryAmount}("");
-        payable(arnenCreator).transfer(msg.value - beneficiaryAmount);
         totalAmountTipped -= msg.value;
+        payable(arnenCreator).transfer(msg.value - beneficiaryAmount);
         emit SentTipped(beneficiary, beneficiaryAmount, data);
         require(sent, "Failed to send Ether");
     }
